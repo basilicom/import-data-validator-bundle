@@ -2,8 +2,6 @@
 
 namespace Basilicom\ImportDataValidator\Command;
 
-use Basilicom\ImportDataValidator\Validator\DefaultRuleSet;
-use Basilicom\ImportDataValidator\Validator\DefaultCsvValidator;
 use Basilicom\ImportDataValidator\Validator\Result\ValidationResult;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\ExceptionInterface;
@@ -26,25 +24,30 @@ class ValidateSamplesCommand extends Command
         $samplePath = __DIR__ . '/../Resources/sample';
 
         $samples = [
-            'invalid.csv',
-            'valid.csv'
+            'invalid',
+            'valid'
         ];
 
         $commandName = ImportDataValidateCommand::COMMAND;
 
         /** @var ValidationResult $result */
         foreach ($samples as $filename) {
-            $arguments = [
-                ImportDataValidateCommand::FILEPATH_ARG          => $samplePath . '/' . $filename,
-                ImportDataValidateCommand::VALIDATOR_SERVICE_ARG => DefaultCsvValidator::class,
-                ImportDataValidateCommand::RULESET_SERVICE_ARG   => DefaultRuleSet::class
-            ];
+            foreach ([
+                '.csv' => 'sample.validator.csv',
+                '.xlsx' => 'sample.validator.xlsx'
+             ] as $extension => $validatorService) {
+                $arguments = [
+                    ImportDataValidateCommand::FILEPATH_ARG          => $samplePath . '/' . $filename . $extension,
+                    ImportDataValidateCommand::VALIDATOR_SERVICE_ARG => $validatorService,
+                    ImportDataValidateCommand::RULESET_SERVICE_ARG   => 'sample.ruleset'
+                ];
 
-            $commandInput = new ArrayInput($arguments);
-            $returnCode = $this->getApplication()->find($commandName)->run($commandInput, $output);
+                $commandInput = new ArrayInput($arguments);
+                $returnCode = $this->getApplication()->find($commandName)->run($commandInput, $output);
 
-            if ($returnCode === Command::FAILURE) {
-                return $returnCode;
+                if ($returnCode === Command::FAILURE) {
+                    return $returnCode;
+                }
             }
         }
 

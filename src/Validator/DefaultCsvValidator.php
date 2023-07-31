@@ -121,4 +121,12 @@ class DefaultCsvValidator implements ValidatorInterface
 
         return $dataset;
     }
+
+    /**
+     * @return string
+     */
+    public function getSeparator(): string
+    {
+        return $this->separator;
+    }
 }
