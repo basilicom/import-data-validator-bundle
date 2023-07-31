@@ -1,0 +1,6 @@
+SKU;Title;Description;Barcode;Size;Price;
+123;"some title";"some description";51992003;M;1
+124;"some title";"some description";51992005;L;2
+125;"some title";"some description";51992007;;3
+126;"some title";"some description";51992009;XL;4
+127;"some title";"some description";51992009;XL;4

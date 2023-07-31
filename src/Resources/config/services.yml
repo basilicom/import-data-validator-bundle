@@ -1,0 +1,68 @@
+services:
+    # default configuration for services in *this* file
+    _defaults:
+        # automatically injects dependencies in your services
+        autowire: true
+        # automatically registers your services as commands, event subscribers, etc.
+        autoconfigure: true
+        # this means you cannot fetch services directly from the container via $container->get()
+        # if you need to do this, you can override this setting on individual services
+        public: false
+
+    # auto-register all commands as services
+    Basilicom\ImportDataValidator\Command\:
+        resource: '../../Command'
+        public: true
+        tags: ['console.command']
+
+    Basilicom\ImportDataValidator\Validator\Result\ValidationResultFactory: ~
+    Basilicom\ImportDataValidator\Validator\Result\ValidationErrorFactory: ~
+
+    default.rules.dataset-count:
+      class: Basilicom\ImportDataValidator\Rules\DatasetCountRule
+      arguments:
+        $countHeadline: false
+        $min: 5
+        $max: 10
+
+    default.rules.existing-columns:
+      class: Basilicom\ImportDataValidator\Rules\ExistingColumnsRule
+      arguments:
+        $columnNames:
+          - 'SKU'
+          - 'Title'
+          - 'Description'
+          - 'Barcode'
+          - 'Size'
+          - 'Price'
+
+    default.rules.regex.sizes:
+      class: Basilicom\ImportDataValidator\Rules\RegexRule
+      arguments:
+        $canBeEmpty: true
+        $columnNames:
+          - 'Size'
+        $regex: '^(XS|S|M|L|XL|XXL)$'
+
+    default.rules.regex.sku:
+      class: Basilicom\ImportDataValidator\Rules\RegexRule
+      arguments:
+        $canBeEmpty: false
+        $columnNames:
+          - 'SKU'
+        $regex: '^\d{3}$'
+
+    Basilicom\ImportDataValidator\Validator\DefaultRuleSet:
+      public: true
+      arguments:
+        $rules:
+          - '@default.rules.dataset-count'
+          - '@default.rules.existing-columns'
+          - '@default.rules.regex.sizes'
+          - '@default.rules.regex.sku'
+
+    Basilicom\ImportDataValidator\Validator\DefaultCsvValidator:
+      public: true
+      arguments:
+        $separator: ';'
+
