@@ -1,6 +1,6 @@
 {
   "name": "basilicom/import-data-validator-bundle",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Base rules and commands to validate csv and xlsx files before an import attempt",
   "type": "symfony-bundle",
   "license": "GPL-3.0-or-later",
@@ -13,6 +13,7 @@
   "minimum-stability": "dev",
   "require": {
     "ext-gd": "*",
+    "ext-json": "*",
     "symfony/http-kernel": "^5.4",
     "symfony/config": "^5.4",
     "symfony/console": "^5.4",
