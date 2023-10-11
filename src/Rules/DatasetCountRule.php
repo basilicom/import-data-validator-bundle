@@ -11,18 +11,21 @@ class DatasetCountRule extends AbstractRule
     private ?int $min;
     private ?int $max;
     private bool $countHeadline;
+    private int $headerLineSize;
 
     public function __construct(
         ValidationErrorFactory $validationErrorFactory,
         ?int $min = null,
         ?int $max = null,
-        $countHeadline = false
+        $countHeadline = false,
+        int $headerLineSize = 1
     ) {
         parent::__construct($validationErrorFactory);
 
-        $this->min           = $min;
-        $this->max           = $max;
-        $this->countHeadline = $countHeadline;
+        $this->min            = $min;
+        $this->max            = $max;
+        $this->countHeadline  = $countHeadline;
+        $this->headerLineSize = $headerLineSize;
     }
 
     public function shouldValidateFile(): bool
@@ -46,7 +49,7 @@ class DatasetCountRule extends AbstractRule
         // https://www.myintervals.com/blog/2011/06/21/calculate-the-number-of-lines-in-a-csv-file-using-php-and-linux/
         $linecount = intval(exec('perl -pe \'s/\r\n|\n|\r/\n/g\' ' . escapeshellarg($filepath) . ' | wc -l'));
         if (!$this->countHeadline) {
-            $linecount--;
+            $linecount -= $this->headerLineSize;
         }
 
         $errors = [];
