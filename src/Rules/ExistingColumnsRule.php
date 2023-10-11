@@ -11,6 +11,7 @@ class ExistingColumnsRule extends AbstractRule
 {
     /** @var string[] */
     private array $columnNames;
+    private int $columnNamesLineNumber;
 
     /**
      * @param ValidationErrorFactory $validationErrorFactory
@@ -18,11 +19,13 @@ class ExistingColumnsRule extends AbstractRule
      */
     public function __construct(
         ValidationErrorFactory $validationErrorFactory,
-        array $columnNames = []
+        array $columnNames = [],
+        $columnNamesLineNumber = 1
     ) {
         parent::__construct($validationErrorFactory);
 
-        $this->columnNames = $columnNames;
+        $this->columnNames           = $columnNames;
+        $this->columnNamesLineNumber = $columnNamesLineNumber;
     }
 
     public function shouldValidateFile(): bool
@@ -54,7 +57,9 @@ class ExistingColumnsRule extends AbstractRule
 
         $separator = $options['separator'] ?? ',';
 
-        $columnNames = fgetcsv($handle, null, $separator);
+        for ($i = 0; $i < $this->columnNamesLineNumber; $i++) {
+            $columnNames = fgetcsv($handle, null, $separator);
+        }
 
         fclose($handle);
 

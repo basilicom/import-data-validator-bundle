@@ -13,15 +13,18 @@ class DefaultCsvValidator implements ValidatorInterface
     private ValidationResultFactory $validationResultFactory;
     private string $separator;
     private ValidationErrorFactory $validationErrorFactory;
+    private int $headerLineSize;
 
     public function __construct(
         ValidationResultFactory $validationResultFactory,
         ValidationErrorFactory $validationErrorFactory,
-        string $separator = ','
+        string $separator = ',',
+        int $headerLineSize = 1
     ) {
         $this->validationResultFactory = $validationResultFactory;
         $this->validationErrorFactory  = $validationErrorFactory;
         $this->separator               = $separator;
+        $this->headerLineSize          = $headerLineSize;
     }
 
     /**
@@ -58,7 +61,10 @@ class DefaultCsvValidator implements ValidatorInterface
             $errors = array_merge($errors, $thisErrors);
         }
 
-        $columnNames = fgetcsv($handle, null, $this->separator);
+        $columnNames = [];
+        for($i = 0; $i < $this->headerLineSize; $i++) {
+            $columnNames = fgetcsv($handle, null, $this->separator);
+        }
         if (empty($columnNames)) {
             return $this->validationResultFactory->getWithErrors(
                 [
@@ -71,7 +77,7 @@ class DefaultCsvValidator implements ValidatorInterface
             );
         }
 
-        $lineNumber = 1;
+        $lineNumber = $this->headerLineSize;
         while($row = fgetcsv($handle, null, $this->separator)) {
             $lineNumber++;
             if (empty($row)) {
